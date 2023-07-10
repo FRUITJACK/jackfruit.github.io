@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JACKFRUIT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fed766; /* 노란색 배경 */
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 60px; /* 큰 제목 글자 크기 */
+      color: #383838; /* 짙은 회색 */
+      text-align: center;
+      font-weight: bold; /* 볼드체 */
+    }
+
+    .menu {
+      display: flex;
+      gap: 10px;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      background-color: #e4f1d1; /* 연두색 배경 */
+      border-radius: 4px;
+    }
+
+    .menu h2 {
+      font-size: 36px; /* 중간 제목 글자 크기 */
+      margin-top: 20;
+      color: #383838; /* 짙은 회색 */
+      font-weight: bold; /* 볼드체 */
+      text-align: center;
+      cursor: pointer; /* 추가: 포인터 커서를 사용하여 클릭 가능하도록 설정 */
+    }
+
+    .menu button:hover {
+      background-color: #99e576; /* 더 진한 연두색 */
+    }
+
+    .sub-menu {
+      display: none; /* 초기에는 sub-menu를 숨김 */
+      position: absolute; /* 절대 위치 설정 */
+      background-color: #fff; /* 흰색 배경 */
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: calc(100% - 60px); /* 항목에 맞는 크기 설정 */
+      margin-top: 20px;
+    }
+
+    .sub-menu.active {
+      display: flex; /* sub-menu를 보여줌 */
+    }
+
+    #subMenuItems {
+      display: flex; /* 가로로 배치 */
+      gap: 2px;
+      justify-content: center; /* 가운데 정렬 */
+      margin: auto; /* 가운데 정렬 */
+    }
+
+    #subMenuItems li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #subMenuItems li .item-button {
+      font-size: 20px;
+      width: 100%;
+      background-color: #fff;
+      border: none;
+      padding: 40px;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 4px;
+      width: 240px
+    }
+
+    #subMenuItems li .item-button:hover {
+      background-color: #e4f1d1;
+    }
+
+    #cartItems {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #cartItems li {
+      margin-bottom: 5px;
+    }
+
+    #totalPrice {
+      font-size: 20px; /* 일반 텍스트 글자 크기 */
+      font-weight: bold; /* 볼드체 */
+      margin-top: 10px;
+      color: #383838; /* 짙은 회색 */
+    }
+
+    .cart-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: calc(100% - 60px);
+    }
+
+    .clear-button {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .clear-button button {
+      font-size: 20px;
+      background-color: #ff677d;
+      font-weight: bold; /* 볼드체 */
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .clear-button button:hover {
+      background-color: #ff4b66;
+    }
+
+    .buy-button {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .buy-button button {
+      font-size: 20px;
+      background-color: #005dff;
+      font-weight: bold; /* 볼드체 */
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .buy-button button:hover {
+      background-color: #003db9;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>JACKFRUIT</h1>
+
+  <div class="menu">
+    <div onclick="showSubMenu('PROTEIN')">
+      <h2>PROTEIN</h2>
+    </div>
+    <div onclick="showSubMenu('ADDITIVE')">
+      <h2>ADDITIVE</h2>
+    </div>
+    <div onclick="showSubMenu('ICE')">
+      <h2>ICE</h2>
+    </div>
+  </div>
+
+  <div id="subMenu" class="sub-menu">
+    <ul id="subMenuItems">
+      <!-- Sub-menu items will be dynamically updated here -->
+    </ul>
+  </div>
+
+  <div class="cart-container">
+    <h2>Cart</h2>
+    <ul id="cartItems"></ul>
+    <p id="totalPrice">Total Price: 0원</p>
+    <div class="clear-button">
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>
+    <div class="buy-button">
+      <button onclick="buyItems()">Buy</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = {};
+    let totalPrice = 0;
+    let activeSubMenu = '';
+
+    function showSubMenu(menu) {
+      const subMenu = document.getElementById('subMenu');
+      const subMenuItems = document.getElementById('subMenuItems');
+
+      if (menu === activeSubMenu) {
+        subMenu.classList.remove('active');
+        activeSubMenu = '';
+      } else {
+        if (menu === 'PROTEIN') {
+          subMenuItems.innerHTML = `
+            <li>
+              <button class="item-button" onclick="addToCart('STRAWBERRY', 1500)">
+                <h3>STRAWBERRY</h3>
+                <h3>1/2 SCOOP</h3>
+                <p>1,500원</p>
+              </button>
+            </li>
+            <li>
+              <button class="item-button" onclick="addToCart('CHOCOLATE', 1500)">
+                <h3>CHOCOLATE</h3>
+                <h3>1/2 SCOOP</h3>
+                <p> 1,500원</p>
+              </button>
+            </li>
+            <li>
+              <button class="item-button" onclick="addToCart('VANILLA', 1500)">
+                <h3>VANILLA</h3>
+                <h3>1/2 SCOOP</h3>
+                <p>1,500원</p>
+              </button>
+            </li>
+          `;
+          activeSubMenu = 'PROTEIN';
+        } else if (menu === 'ADDITIVE') {
+          subMenuItems.innerHTML = `
+            <li>
+              <button class="item-button" onclick="addToCart('BCAA', 1000)">
+                <h3>BCAA</h3>
+                <h3>1 SCOOP</h3>
+                <p>1,000원</p>
+              </button>
+            </li>
+            <li>
+              <button class="item-button" onclick="addToCart('CREATINE', 1000)">
+                <h3>CREATINE</h3>
+                <h3>1 SCOOP</h3>
+                <p>1,000원</p>
+              </button>
+            </li>
+            <li>
+              <button class="item-button" onclick="addToCart('VITAMIN', 1000)">
+                <h3>VITAMIN</h3>
+                <h3>1 SCOOP</h3>
+                <p>1,000원</p>
+              </button>
+            </li>
+          `;
+          activeSubMenu = 'ADDITIVE';
+        } else if (menu === 'ICE') {
+          subMenuItems.innerHTML = `
+            <li>
+              <button class="item-button" onclick="addToCart('YES', 500)">
+                <h3>YES</h3>
+                <p>500원</p>
+              </button>
+            </li>
+            <li>
+              <button class="item-button" onclick="addToCart('NO', 0)">
+                <h3>NO</h3>
+                <p>0원</p>
+              </button>
+            </li>
+          `;
+          activeSubMenu = 'ICE';
+        }
+
+        subMenu.classList.add('active');
+      }
+    }
+
+    function addToCart(item, price) {
+      if (cart[item]) {
+        cart[item] += 1;
+      } else {
+        cart[item] = 1;
+      }
+
+      totalPrice += price;
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItemsElement = document.getElementById('cartItems');
+      const totalPriceElement = document.getElementById('totalPrice');
+
+      cartItemsElement.innerHTML = '';
+      for (let item in cart) {
+        const li = document.createElement('li');
+        li.textContent = `${item} × ${cart[item]}`;
+        cartItemsElement.appendChild(li);
+      }
+
+      totalPriceElement.textContent = `Total Price: ${totalPrice}원`;
+    }
+
+    function clearCart() {
+      cart = {};
+      totalPrice = 0;
+      updateCart();
+    }
+
+    function buyItems() {
+      alert('LIGHT WEIGHT BABE \u{1F60D}');
+      clearCart();
+    }
+
+    const subMenu = document.getElementById('subMenu');
+    subMenu.classList.remove('active');
+  </script>
+</body>
+</html>
